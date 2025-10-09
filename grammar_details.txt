@@ -12,9 +12,9 @@ top-level statements are as follows
         ...S
     return
 
-// TYPE is one of: bool num string proc
+// TYPE is one of: bool num string proc; the simple "proc" type is deprecated since adding call arguments; I'm still learning how complex type systems can be implemented
 // the type may be prefixed with * to denote a list of that type
-// CONST is "true", "false", a literal number, a quoted string, or the name of a global variable or procedure
+// CONST is "true", "false", a literal number, a quoted string, or the name of a previously-defined variable or procedure
 // declarations are always read and evaluated in the order written
 
 ...A is 0 or more comma-separated "TYPE NAME" phrases
@@ -78,3 +78,4 @@ EXPR is as follows
     EXPR[EXPR]
     - EXPR
     EXPR AOP EXPR // where "AOP" is one of + - * /
+
