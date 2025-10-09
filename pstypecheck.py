@@ -170,7 +170,7 @@ class TypeChecker:
         return self.check_body((), stmt["default"], "type check failed in case default body")
     def check_set(self, stmt) -> bool:
         name: str = stmt["name"]
-        if name == name.capitalize():
+        if name == name.capitalize() and name != "_"*len(name):
             print("cannot assign to constants (CAPITALIZED-named values)")
             return False
         result = self.decide_expression(stmt["argument"])
@@ -197,16 +197,17 @@ class TypeChecker:
             return False
         return True
     def check_call(self, stmt) -> bool:
-        typ = self.u_get_id_type(stmt["name"])
+        name = stmt["name"]
+        typ = self.u_get_id_type(name)
         if not isinstance(typ, tuple):
-            print(f"cannot call variable {typ} {stmt['name']}")
+            print(f"cannot call variable {typ} {name}")
             return False
         if len(typ) != len(stmt["arguments"]):
-            print(f"attempted to call proc {stmt['name']} {typ} with {stmt['arguments']} arguments")
+            print(f"attempted to call proc {name} {typ} with {stmt['arguments']} arguments")
             return False
         for expected, arg in zip(typ, stmt["arguments"]):
             if expected != self.decide_expression(arg):
-                print(f"incompatibly typed arguments to proc {stmt['name']} {typ}")
+                print(f"incompatibly typed arguments to proc {name} {typ}")
                 return False
         return True
     def u_supports_io(self, expr, allow_const=True) -> bool:
@@ -237,9 +238,10 @@ class TypeChecker:
             return expr_type
         match expr_type:
             case "identifier":
-                typ = self.u_get_id_type(expr["name"])
+                name = expr["name"]
+                typ = self.u_get_id_type(name)
                 if typ is None:
-                    print(f"name error: undefined variable {expr['name']}")
+                    print(f"name error: undefined variable {name}")
                 return typ
             case "prefix":
                 right = self.decide_expression(expr["right"])
@@ -321,7 +323,7 @@ class TypeChecker:
                     return None
                 final = type_map.get(tuple(args))
                 if final is None:
-                    print(f"type error: {expr['name']} called with incompatible arguments")
+                    print(f"type error: {name} called with incompatible arguments")
                     return None
                 return final
             case "list":
@@ -368,4 +370,5 @@ def type_merge(x, y):
         return ([result], ok)
     return (x, x==y)
     
+
 
