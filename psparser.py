@@ -1,7 +1,7 @@
 from psmagic import magic_parse_tree
 
-
-# TODO: set x[y] = ...
+# there is some irony here that a no-backtrack parser is much harder to maintain and extend than a backtracking parser
+# TODO: implement "set x[y] = ..."
 
 # for the AST, this parser will just use
 # JSON: type = bool | int | str | list[JSON] | dict[str, JSON]
@@ -19,7 +19,7 @@ def build_infix_precedence():
     # (2x, 2x+1) is a left-associative operation
     # (2x, 2x-1) is a right-associative operation
     # prefix precedence should have right-like numbers
-    # suffix precedence shoulf have left-like numbers
+    # suffix precedence should have left-like numbers
     table = {
         "OR": (10, 11), "AND": (20, 21),
         "+": (50, 51), "-": (50, 51),
@@ -29,7 +29,7 @@ def build_infix_precedence():
     for op in set("< > <= >= <> =".split()):
         table[op] = (30, 31)
     return table
-PREFIX_PRECEDENCE = {"NOT": 20, "-": 50}
+PREFIX_PRECEDENCE = {"NOT": 21, "-": 51}
 INFIX_PRECEDENCE = build_infix_precedence()
 INFIX_TREE = lambda op, x, z: {"type": "infix", "operator": op, "left": x, "right": z}
 PREFIX_TREE = lambda op, z: {"type": "prefix", "operator": op, "right": z}
@@ -307,7 +307,9 @@ class PseudocodeParser:
         '''
         accept anything that resembles a location in memory
         conditionally accept general expressions
+        if allow_literal: accept literals as well
         TODO: restructure this to meet the new (above) spec
+        current behavior: accept variable names (or also literals, depending)
         '''
         items = []
         token = self.token()
@@ -496,3 +498,4 @@ def parse(tokens:list[str]):
         if part["type"] == "err":
             break
     return parts
+
