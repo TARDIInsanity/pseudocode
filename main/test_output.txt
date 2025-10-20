@@ -1,0 +1,5 @@
+'alpha', 10
+'bravo', 22
+'charlie', 303
+'delta', 44944
+'_total_', 45279

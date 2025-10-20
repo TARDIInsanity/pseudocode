@@ -1,0 +1,95 @@
+top-level statements are as follows
+
+    start
+        Declarations
+            ...D
+        ...S
+    end
+
+    NAME(...A)
+        Declarations
+            ...D
+        ...S
+    return
+
+// TYPE is one of: bool num float string InputFile OutputFile proc(TYPE...)
+// the type may be suffixed with [num] to denote a list of that type
+// CONST is "true", "false", a literal number, a quoted string, or the name of a global procedure
+// declarations are always read and evaluated in the order written
+
+...A is 0 or more comma-separated "TYPE NAME" phrases
+
+...D are as follows
+
+    TYPE NAME [...expr]...
+
+    TYPE NAME [...expr]... = EXPR
+
+...S are as follows
+
+    if CONDITION then
+        ...S
+    else
+        ...S
+    endif
+
+    while CONDITION
+        ...S
+    endwhile
+
+    for NAME = EXPR to EXPR step EXPR
+        ...S
+    endfor
+
+    case NAME
+        CONST: ...
+        CONST: ...
+        default: ...
+    endcase
+
+    do
+        ...S
+    until CONDITION
+
+    set LVAL = EXPR
+
+    input NAME, NAME...
+    output UNIT, UNIT...
+    input NAME, NAME... from NAME
+    output UNIT, UNIT... to NAME
+    open NAME ATOM
+    close NAME
+    
+    NAME(EXPR...)
+
+LVAL is as follows
+    NAME
+    NAME[EXPR]
+    NAME[EXPR][EXPR]
+    ...
+
+CONDITION is as follows
+
+    (CONDITION)
+    CONDITION OR CONDITION
+    CONDITION AND CONDITION
+    NOT CONDITION
+    EXPR COP EXPR // where "COP" is one of < > <= >= <> =
+    CHECK(EXPR...)
+    // where "CHECK" is one of isNumeric isChar isWhitespace isUpper or other builtin function names
+    // each function has its own type signature, some are valid expressions too
+    // the parser folds conditions and expressions into a single parse rule
+    // the type checker verifies the validity of expressions as-necessary
+
+EXPR is as follows
+
+    [EXPR...] // a comma-delimited list optionally ending in a redundant comma
+    (EXPR)
+    EXPR[EXPR]
+    - EXPR
+    EXPR AOP EXPR // where "AOP" is one of + - * / or any other infix added later
+
+// parse rules pertaining to indentation mixed with []-less listing
+// (per the pseudocode guideline in class) are unfeasibly complex and highly error-prone
+// virtually all modern languages have explicit list grouping;
+// Python is somewhat exceptional in possessing contexts where ()-less tuples are permitted.
