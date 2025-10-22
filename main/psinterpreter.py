@@ -129,7 +129,6 @@ class Interpreter:
                 return List(elem, value)
             case x:
                 raise NotImplementedError(f"type-suffix {repr(x)}")
-        raise NotImplementedError # TODO
     def select_open_mode(self, name: str):
         var = self.get_var(name)
         if var.type == Basic("InputFile"):
@@ -239,9 +238,7 @@ class Interpreter:
         # read input
         destination = stmt["file"]
         if destination is None:
-            results = self.probe_console_input(variables)
-            for v,r in zip(variables, results):
-                v.value = r
+            self.probe_console_input(variables)
             return
         file = self.eval_atom(destination)
         string = file.readline()
@@ -251,6 +248,10 @@ class Interpreter:
         if string[-1] == "\n":
             string = string[:-1]
         results = json.loads("["+string+"]")
+        if len(results) < len(variables):
+            print("Input warning: not enough values for variables")
+        elif len(results) > len(variables):
+            print("Input warning: too many values for variables")
         for v,r in zip(variables, results):
             if v.type == Basic("num"):
                 v.value = int(r)
@@ -273,6 +274,8 @@ class Interpreter:
             results.append(input())
         else:
             raise NotImplementedError("undefined input type")
+        for v,r in zip(variables, results):
+            v.value = r
         return results
     def get_var(self, name) -> Variable | None:
         for vars in reversed(self.var_stack):
@@ -288,11 +291,12 @@ class Interpreter:
             self.canonical_print(*parts) # assume type check has validated this
         else:
             file = self.eval_atom(destination)
-            file.write(", ".join(repr(i) for i in parts)+"\n")
+            # printing as 'true' and 'false' necessary for JSON
+            file.write(", ".join('true' if i is True else 'false' if i is False else repr(i) for i in parts)+"\n")
     def do_open(self, stmt, mode):
         path = self.eval_atom(stmt["path"])
         if path in self.open_files:
-            raise PermissionError("...")
+            raise PermissionError("cannot open a file while it's open")
         var = self.get_var(stmt["name"])
         file = open(path, mode)
         var.value = file
