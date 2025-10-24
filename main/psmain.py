@@ -15,9 +15,12 @@ def maybe_store(path, content):
         with open(path, "w") as file:
             file.write(str(content))
 
-def interpret(path: str):
-    with open(path, "r") as file:
-        code = file.read()
+def interpret(path: str=None, code: str=None):
+    if path is not None:
+        with open(path, "r") as file:
+            code = file.read()
+    if code is None:
+        quit()
     ok, _, raw_tree = Parser.parse(code)
     if not ok:
         print("Parse failed")
@@ -36,6 +39,7 @@ def interpret(path: str):
 
 if __name__ == "__main__":
     if CODE_PATH:
-        interpret(CODE_PATH)
+        interpret(path=CODE_PATH)
     else:
-        interpret(sample)
+        interpret(code=sample)
+
