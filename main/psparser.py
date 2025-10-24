@@ -139,12 +139,13 @@ class Parser:
         '''
         original = index
         key, arg = rule
-        seen = {}
+        seen = set()
         STACK.append([])
         while key == "rule":
             STACK[-1].append(arg)
             if arg in seen:
                 raise RecursionError(f"definition of rule ({rule[1]}) is part of a trivial cycle")
+            seen.add(arg)
             key, arg = self.GENERAL[arg]
         STACK[-1].append(key)
         ttype, tvalue = self.next_any(index)
@@ -621,3 +622,4 @@ class Postparser:
         "arraytypesuffix": ("list", (("type", "["), ("type", "]"), None, ("maybe", ("rule", "expr")), "failed to parse [...] array suffix")),
         "proctype": ("all", [("type", "proc"), ("list", (("type", "("), ("type", ")"), ("type", ","), ("all", [("type", "elementtype"), ("repeat", ("rule", "arraytypesuffix"))]), "proc type parse failed"))]),
     }
+
